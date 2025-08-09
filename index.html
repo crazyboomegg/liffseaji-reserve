@@ -65,13 +65,6 @@
           await liff.sendMessages([{ type: 'text', text }]);
           liff.closeWindow();
         });
-
-        document.getElementById('copy').addEventListener('click', async () => {
-          try { await navigator.clipboard.writeText(fmt()); } catch {}
-          alert('已複製，回到聊天室貼上即可送出。');
-          liff.closeWindow();
-        });
-
       } catch (e) {
         console.error('LIFF error', e);
         alert('LIFF 初始化失敗，請稍後再試');
