@@ -1,32 +1,40 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>預約訊息</title>
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  </head>
-  <body>
-    <script>
-      liff
-        .init({ liffId: "2007887322-KydEQEgB" })
-        .then(() => {
-          liff
-            .sendMessages([
-              {
-                type: "text",
-                text: "我要預約諮詢",
-              },
-            ])
-            .then(() => {
-              liff.closeWindow();
-            })
-            .catch((err) => {
-              console.error("Send message error", err);
-            });
-        })
-        .catch((err) => {
-          console.error("LIFF init error", err);
-        });
-    </script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>預約訊息</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif; padding: 20px; }
+    input, button { font-size: 16px; padding: 10px; width: 100%; box-sizing: border-box; }
+    button { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h2>送出前確認</h2>
+  <input id="msg" value="我要預約諮詢" />
+  <button id="sendBtn">送出到聊天室</button>
+
+  <script>
+    (async () => {
+      await liff.init({ liffId: "你的_LIFF_ID" });
+      if (!liff.isInClient()) {
+        alert("請從 LINE 圖文選單進入（LIFF URL）");
+        return;
+      }
+      document.getElementById('sendBtn').addEventListener('click', async () => {
+        try {
+          const text = document.getElementById('msg').value.trim();
+          if (!text) return alert('內容不可為空');
+          await liff.sendMessages([{ type: 'text', text }]);
+          liff.closeWindow();
+        } catch (e) {
+          console.error(e);
+          alert('送出失敗，請稍後再試');
+        }
+      });
+    })();
+  </script>
+</body>
 </html>
