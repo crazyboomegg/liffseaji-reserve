@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>預約訊息</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  </head>
+  <body>
+    <script>
+      liff
+        .init({ liffId: "2007887322-KydEQEgB" })
+        .then(() => {
+          liff
+            .sendMessages([
+              {
+                type: "text",
+                text: "我要預約諮詢",
+              },
+            ])
+            .then(() => {
+              liff.closeWindow();
+            })
+            .catch((err) => {
+              console.error("Send message error", err);
+            });
+        })
+        .catch((err) => {
+          console.error("LIFF init error", err);
+        });
+    </script>
+  </body>
+</html>
