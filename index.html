@@ -22,7 +22,7 @@
 
   <label>電話</label>
   <input id="phone" inputmode="tel" placeholder="09xx-xxx-xxx" />
-  
+
   <label>日期</label>
   <input id="date" type="date" />
 
@@ -41,72 +41,97 @@
   </div>
 
   <script>
-    const fmt = () => {
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const dt = getDateTimeText();
-      const service = document.getElementById('service').value.trim();
-      return `姓名：${name}\n電話：${phone}\n日期及時間：${dt}\n服務項目：${service}`;
-    };
-
-    (async () => {
-      try {
-        await liff.init({ liffId: '2007887322-KydEQEgB' });
-
-        // 可選：自動帶入 LINE 暱稱當預設姓名
-        try {
-          const p = await liff.getProfile();
-          if (p?.displayName) document.getElementById('name').value = p.displayName;
-        } catch {}
-
-        document.getElementById('send').addEventListener('click', async () => {
-          if (!liff.isInClient()) { alert('請從 LINE 圖文選單進入此頁面'); return; }
-          const text = fmt();
-          if (text.includes('：\n') || text.includes('：')) {
-            // 簡單檢查：至少要有姓名與服務
-          }
-          await liff.sendMessages([{ type: 'text', text }]);
-          liff.closeWindow();
-        });
-      } catch (e) {
-        console.error('LIFF error', e);
-        alert('LIFF 初始化失敗，請稍後再試');
-      }
-    })();
-
-      // ---- 半小時吸附（保險）----
+  // ---- 工具 ----
   const pad = n => String(n).padStart(2,'0');
-  function snapTimeToHalfHour() {
-    const t = document.getElementById('time').value; // "HH:MM"
-    if (!t) return;
-    const [H, M] = t.split(':').map(Number);
-    const minutes = H * 60 + M;
-    const snapped = Math.round(minutes / 30) * 30;
-    const h = Math.floor(snapped / 60), m = snapped % 60;
-    document.getElementById('time').value = `${pad(h)}:${pad(m)}`;
+
+  // 本地日期字串 YYYY-MM-DD
+  function toLocalDateString(d) {
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   }
 
-  // 進頁面時預設成「下一個半小時」
+  // 預設：下一個半小時
   function setDefaultDateTime() {
     const now = new Date();
-    const step = 30 * 60 * 1000;
-    const next = new Date(Math.ceil(now.getTime() / step) * step);
-    document.getElementById('date').value = next.toISOString().slice(0,10);
+    const stepMs = 30 * 60 * 1000;
+    const next = new Date(Math.ceil(now.getTime() / stepMs) * stepMs);
+    document.getElementById('date').value = toLocalDateString(next);
     document.getElementById('time').value = `${pad(next.getHours())}:${pad(next.getMinutes())}`;
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    setDefaultDateTime();
-    document.getElementById('time').addEventListener('change', snapTimeToHalfHour);
-    document.getElementById('time').addEventListener('blur', snapTimeToHalfHour);
-  });
+  // 將時間吸附到 00/30 分；避免出現 24:00
+  function snapTimeToHalfHour() {
+    const el = document.getElementById('time');
+    if (!el.value) return;
+    const [H, M] = el.value.split(':').map(Number);
+    const total = H * 60 + M;
+    let snapped = Math.round(total / 30) * 30;
+    if (snapped >= 24 * 60) snapped = 23 * 60 + 30; // 23:30 當作最後一格
+    const hh = Math.floor(snapped / 60), mm = snapped % 60;
+    el.value = `${pad(hh)}:${pad(mm)}`;
+  }
 
-  // 送出時把 date+time 合併成原本格式
+  // 設定今天為 min，避免選到過去日期
+  function setMinDateToday() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth()+1).padStart(2,'0');
+    const dd = String(today.getDate()).padStart(2,'0');
+    document.getElementById('date').setAttribute('min', `${yyyy}-${mm}-${dd}`);
+  }
+
   function getDateTimeText() {
     const d = document.getElementById('date').value;   // YYYY-MM-DD
     const t = document.getElementById('time').value;   // HH:MM
     return `${d} ${t}`;
   }
+
+  function fmt() {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const dt = getDateTimeText();
+    const service = document.getElementById('service').value.trim();
+    return `姓名：${name}\n電話：${phone}\n日期及時間：${dt}\n服務項目：${service}`;
+  }
+
+  // 最基本的必填檢查
+  function validate() {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const service = document.getElementById('service').value.trim();
+    if (!name) { alert('請填寫姓名'); return false; }
+    if (!phone) { alert('請填寫電話'); return false; }
+    if (!service) { alert('請選擇服務項目'); return false; }
+    return true;
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    setMinDateToday(); 
+    // 預設日期時間 & 半小時吸附
+    setDefaultDateTime();
+    document.getElementById('time').addEventListener('change', snapTimeToHalfHour);
+    document.getElementById('time').addEventListener('blur', snapTimeToHalfHour);
+
+    try {
+      await liff.init({ liffId: '2007887322-KydEQEgB' });
+
+      // 可選：帶入 LINE 暱稱
+      try {
+        const p = await liff.getProfile();
+        if (p?.displayName) document.getElementById('name').value = p.displayName;
+      } catch {}
+
+      document.getElementById('send').addEventListener('click', async () => {
+        if (!liff.isInClient()) { alert('請從 LINE 圖文選單進入此頁面'); return; }
+        snapTimeToHalfHour(); 
+        if (!validate()) return;
+        await liff.sendMessages([{ type: 'text', text: fmt() }]);
+        liff.closeWindow();
+      });
+    } catch (e) {
+      console.error('LIFF init error', e);
+      alert('LIFF 初始化失敗：' + (e?.message || e));
+    }
+  });
 
   </script>
 </body>
