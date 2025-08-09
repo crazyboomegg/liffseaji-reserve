@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>預約表單</title>
+  <title>Sea指</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body { font-family: -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif; padding:20px; }
@@ -24,22 +24,18 @@
   <input id="phone" inputmode="tel" placeholder="09xx-xxx-xxx" />
 
   <label>日期與時間</label>
-  <input id="dt" type="datetime-local" />
+  <input id="dt" type="datetime-local" step="1800" />
 
   <label>服務項目</label>
   <select id="service">
     <option value="">請選擇</option>
-    <option>市區接送</option>
-    <option>機場接送</option>
-    <option>代駕服務</option>
-    <option>包車/自訂路線</option>
+    <option>全身指壓</option>
+    <option>足療</option>
   </select>
 
   <div class="row">
     <button id="send">送出到聊天室</button>
-    <button id="copy">複製文字並關閉</button>
   </div>
-  <p class="tip">在 LINE 內開啟即可一鍵送出；或先複製文字回聊天室貼上。</p>
 
   <script>
     const fmt = () => {
@@ -52,7 +48,7 @@
 
     (async () => {
       try {
-        await liff.init({ liffId: '你的_LIFF_ID' });
+        await liff.init({ liffId: '2007887322-KydEQEgBD' });
 
         // 可選：自動帶入 LINE 暱稱當預設姓名
         try {
