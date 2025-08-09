@@ -1,39 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>預約訊息</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>預約表單</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif; padding: 20px; }
-    input, button { font-size: 16px; padding: 10px; width: 100%; box-sizing: border-box; }
-    button { margin-top: 12px; }
+    body { font-family: -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif; padding:20px; }
+    label { display:block; margin:10px 0 6px; font-size:14px; color:#333; }
+    input, select, button, textarea { width:100%; padding:12px; font-size:16px; box-sizing:border-box; }
+    button { margin-top:14px; border-radius:10px; border:1px solid #ddd; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .tip { font-size:13px; color:#666; margin-top:8px; }
   </style>
 </head>
 <body>
-  <h2>送出前確認</h2>
-  <input id="msg" value="我要預約諮詢可以嗎" />
-  <button id="sendBtn">送出到聊天室</button>
+  <h2>預約資訊</h2>
+
+  <label>姓名</label>
+  <input id="name" placeholder="王小明" />
+
+  <label>電話</label>
+  <input id="phone" inputmode="tel" placeholder="09xx-xxx-xxx" />
+
+  <label>日期與時間</label>
+  <input id="dt" type="datetime-local" />
+
+  <label>服務項目</label>
+  <select id="service">
+    <option value="">請選擇</option>
+    <option>市區接送</option>
+    <option>機場接送</option>
+    <option>代駕服務</option>
+    <option>包車/自訂路線</option>
+  </select>
+
+  <div class="row">
+    <button id="send">送出到聊天室</button>
+    <button id="copy">複製文字並關閉</button>
+  </div>
+  <p class="tip">在 LINE 內開啟即可一鍵送出；或先複製文字回聊天室貼上。</p>
 
   <script>
+    const fmt = () => {
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const dt = document.getElementById('dt').value;
+      const service = document.getElementById('service').value.trim();
+      return `姓名：${name}\n電話：${phone}\n日期及時間：${dt}\n服務項目：${service}`;
+    };
+
     (async () => {
-      await liff.init({ liffId: "你的_LIFF_ID" });
-      if (!liff.isInClient()) {
-        alert("請從 LINE 圖文選單進入（LIFF URL）");
-        return;
-      }
-      document.getElementById('sendBtn').addEventListener('click', async () => {
+      try {
+        await liff.init({ liffId: '你的_LIFF_ID' });
+
+        // 可選：自動帶入 LINE 暱稱當預設姓名
         try {
-          const text = document.getElementById('msg').value.trim();
-          if (!text) return alert('內容不可為空');
+          const p = await liff.getProfile();
+          if (p?.displayName) document.getElementById('name').value = p.displayName;
+        } catch {}
+
+        document.getElementById('send').addEventListener('click', async () => {
+          if (!liff.isInClient()) { alert('請從 LINE 圖文選單進入此頁面'); return; }
+          const text = fmt();
+          if (text.includes('：\n') || text.includes('：')) {
+            // 簡單檢查：至少要有姓名與服務
+          }
           await liff.sendMessages([{ type: 'text', text }]);
           liff.closeWindow();
-        } catch (e) {
-          console.error(e);
-          alert('送出失敗，請稍後再試');
-        }
-      });
+        });
+
+        document.getElementById('copy').addEventListener('click', async () => {
+          try { await navigator.clipboard.writeText(fmt()); } catch {}
+          alert('已複製，回到聊天室貼上即可送出。');
+          liff.closeWindow();
+        });
+
+      } catch (e) {
+        console.error('LIFF error', e);
+        alert('LIFF 初始化失敗，請稍後再試');
+      }
     })();
   </script>
 </body>
