@@ -22,9 +22,12 @@
 
   <label>電話</label>
   <input id="phone" inputmode="tel" placeholder="09xx-xxx-xxx" />
+  
+  <label>日期</label>
+  <input id="date" type="date" />
 
-  <label>日期與時間</label>
-  <input id="dt" type="datetime-local" step="1800" />
+  <label>時間（每 30 分）</label>
+  <input id="time" type="time" step="1800" />
 
   <label>服務項目</label>
   <select id="service">
@@ -41,7 +44,7 @@
     const fmt = () => {
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
-      const dt = document.getElementById('dt').value;
+      const dt = getDateTimeText();
       const service = document.getElementById('service').value.trim();
       return `姓名：${name}\n電話：${phone}\n日期及時間：${dt}\n服務項目：${service}`;
     };
@@ -70,6 +73,41 @@
         alert('LIFF 初始化失敗，請稍後再試');
       }
     })();
+
+      // ---- 半小時吸附（保險）----
+  const pad = n => String(n).padStart(2,'0');
+  function snapTimeToHalfHour() {
+    const t = document.getElementById('time').value; // "HH:MM"
+    if (!t) return;
+    const [H, M] = t.split(':').map(Number);
+    const minutes = H * 60 + M;
+    const snapped = Math.round(minutes / 30) * 30;
+    const h = Math.floor(snapped / 60), m = snapped % 60;
+    document.getElementById('time').value = `${pad(h)}:${pad(m)}`;
+  }
+
+  // 進頁面時預設成「下一個半小時」
+  function setDefaultDateTime() {
+    const now = new Date();
+    const step = 30 * 60 * 1000;
+    const next = new Date(Math.ceil(now.getTime() / step) * step);
+    document.getElementById('date').value = next.toISOString().slice(0,10);
+    document.getElementById('time').value = `${pad(next.getHours())}:${pad(next.getMinutes())}`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setDefaultDateTime();
+    document.getElementById('time').addEventListener('change', snapTimeToHalfHour);
+    document.getElementById('time').addEventListener('blur', snapTimeToHalfHour);
+  });
+
+  // 送出時把 date+time 合併成原本格式
+  function getDateTimeText() {
+    const d = document.getElementById('date').value;   // YYYY-MM-DD
+    const t = document.getElementById('time').value;   // HH:MM
+    return `${d} ${t}`;
+  }
+
   </script>
 </body>
 </html>
