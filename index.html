@@ -40,6 +40,40 @@
     <button id="send">送出預約單</button>
   </div>
 
+  <div id="myAlert" class="alert-box">
+    <div class="alert-content">
+      <p id="alertMessage"></p>
+      <button onclick="closeAlert()">確定</button>>
+    </div>
+  </div>
+
+<style>
+.alert-box {
+  display: none; /* 預設隱藏 */
+  position: fixed; top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.4);
+  justify-content: center; align-items: center;
+}
+.alert-content {
+  background: white; padding: 20px; border-radius: 8px;
+  font-size: 18px; /* 這裡可以調整字體大小 */
+  text-align: center;
+}
+.alert-content button {
+  margin-top: 12px; padding: 8px 16px;
+}
+</style>
+
+<script>
+function showAlert(msg) {
+  document.getElementById("alertMessage").innerText = msg;
+  document.getElementById("myAlert").style.display = "flex";
+}
+function closeAlert() {
+  document.getElementById("myAlert").style.display = "none";
+}
+</script>
+
   <script>
   // ---- 工具 ----
   const pad = n => String(n).padStart(2,'0');
@@ -87,7 +121,7 @@
       dateEl.value = toLocalDateString(next);
       timeEl.value = `${pad(next.getHours())}:${pad(next.getMinutes())}`;
       if (showAlert) {
-        alert('不能選擇已經過去的時間，已自動調整為下一個可用時段');
+        showAlert('不能選擇已經過去的時間，已自動調整為下一個可用時段');
       }
       return false;
     }
@@ -139,9 +173,9 @@
     const name = document.getElementById('name').value.trim();
     const phone = document.getElementById('phone').value.trim();
     const service = document.getElementById('service').value.trim();
-    if (!name) { alert('請填寫姓名'); return false; }
-    if (!phone) { alert('請填寫電話'); return false; }
-    if (!service) { alert('請選擇服務項目'); return false; }
+    if (!name) { showAlert('請填寫姓名'); return false; }
+    if (!phone) { showAlert('請填寫電話'); return false; }
+    if (!service) { showAlert('請選擇服務項目'); return false; }
     return true;
   }
 
