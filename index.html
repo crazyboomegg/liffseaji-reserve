@@ -23,7 +23,7 @@
   <label>電話</label>
   <input id="phone" inputmode="tel" placeholder="09xx-xxx-xxx" />
 
-  <label>日期</label>
+  <label>日期<span id ="weekday" style="color:#666; font-size:12px;"></span></label>
   <input id="date" type="date" />
 
   <label>時間（每 30 分）</label>
@@ -145,6 +145,19 @@ function closeAlert() {
     return true;
   }
 
+  // 顯示星期幾
+  function updateWeekday() {
+    const dateEl = document.getElementById('date');
+    const weekdayEl = document.getElementById('weekday');
+    if (!dateEl.value) {
+      weekdayEl.textContent = '';
+      return;
+    }
+    const date = new Date(dateEl.value);
+    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    weekdayEl.textContent = `(${weekdays[date.getDay()]})`;
+  }
+
   // 設定今天為 min，避免選到過去日期
   function setMinDateToday() {
     const today = new Date();
@@ -183,6 +196,7 @@ function closeAlert() {
     setMinDateToday();
     // 預設日期時間 & 半小時吸附
     setDefaultDateTime();
+    updateWeekday();
 
     // 時間變更時的處理
     function handleTimeChange() {
@@ -193,6 +207,7 @@ function closeAlert() {
     // 日期變更時也要檢查時間
     function handleDateChange() {
       validateDateTime();
+      updateWeekday();
     }
 
     // 為了確保在手機上也能正常工作，加上多種事件監聽器
