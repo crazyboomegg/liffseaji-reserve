@@ -70,6 +70,47 @@
     el.value = `${pad(hh)}:${pad(mm)}`;
   }
 
+  // 檢查並限制時間不能選擇已經過去的時間
+  function validateDateTime(showAlert = true) {
+    const dateEl = document.getElementById('date');
+    const timeEl = document.getElementById('time');
+
+    if (!dateEl.value || !timeEl.value) return true;
+
+    const selectedDate = new Date(dateEl.value + 'T' + timeEl.value);
+    const now = new Date();
+
+    // 如果選擇的日期時間已經過去，則調整到下一個可用的半小時
+    if (selectedDate <= now) {
+      const stepMs = 30 * 60 * 1000;
+      const next = new Date(Math.ceil(now.getTime() / stepMs) * stepMs);
+      dateEl.value = toLocalDateString(next);
+      timeEl.value = `${pad(next.getHours())}:${pad(next.getMinutes())}`;
+      if (showAlert) {
+        alert('不能選擇已經過去的時間，已自動調整為下一個可用時段');
+      }
+      return false;
+    }
+    return true;
+  }
+
+  // 強制檢查時間是否有效（用於提交前的最終檢查）
+  function forceValidateDateTime() {
+    const dateEl = document.getElementById('date');
+    const timeEl = document.getElementById('time');
+
+    if (!dateEl.value || !timeEl.value) return false;
+
+    const selectedDate = new Date(dateEl.value + 'T' + timeEl.value);
+    const now = new Date();
+
+    if (selectedDate <= now) {
+      alert('不能預約已經過去的時間，請重新選擇');
+      return false;
+    }
+    return true;
+  }
+
   // 設定今天為 min，避免選到過去日期
   function setMinDateToday() {
     const today = new Date();
@@ -105,11 +146,37 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-    setMinDateToday(); 
+    setMinDateToday();
     // 預設日期時間 & 半小時吸附
     setDefaultDateTime();
-    document.getElementById('time').addEventListener('change', snapTimeToHalfHour);
-    document.getElementById('time').addEventListener('blur', snapTimeToHalfHour);
+
+    // 時間變更時的處理
+    function handleTimeChange() {
+      snapTimeToHalfHour();
+      validateDateTime();
+    }
+
+    // 日期變更時也要檢查時間
+    function handleDateChange() {
+      validateDateTime();
+    }
+
+    // 為了確保在手機上也能正常工作，加上多種事件監聽器
+    const timeEl = document.getElementById('time');
+    const dateEl = document.getElementById('date');
+
+    timeEl.addEventListener('change', handleTimeChange);
+    timeEl.addEventListener('blur', handleTimeChange);
+    timeEl.addEventListener('input', handleTimeChange);
+    timeEl.addEventListener('focusout', handleTimeChange);
+
+    dateEl.addEventListener('change', handleDateChange);
+    dateEl.addEventListener('input', handleDateChange);
+
+    // 定期檢查（每秒檢查一次，確保時間不會過期）
+    setInterval(() => {
+      validateDateTime(false); // 不顯示警告，靜默調整
+    }, 1000);
 
     try {
       await liff.init({ liffId: '2007887322-KydEQEgB' });
@@ -122,7 +189,11 @@
 
       document.getElementById('send').addEventListener('click', async () => {
         if (!liff.isInClient()) { alert('請從 LINE 圖文選單進入此頁面'); return; }
-        snapTimeToHalfHour(); 
+        snapTimeToHalfHour();
+
+        // 強制檢查時間是否有效
+        if (!forceValidateDateTime()) return;
+
         if (!validate()) return;
         await liff.sendMessages([{ type: 'text', text: fmt() }]);
         liff.closeWindow();
