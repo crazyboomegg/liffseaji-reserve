@@ -43,7 +43,7 @@
   <div id="myAlert" class="alert-box">
     <div class="alert-content">
       <p id="alertMessage"></p>
-      <button onclick="closeAlert()">確定</button>>
+      <button onclick="closeAlert()">確定</button>
     </div>
   </div>
 
@@ -55,8 +55,8 @@
   justify-content: center; align-items: center;
 }
 .alert-content {
-  background: white; padding: 20px; border-radius: 8px;
-  font-size: 18px; /* 這裡可以調整字體大小 */
+  background: white; padding: 40px; border-radius: 8px;
+  font-size: 20px; /* 這裡可以調整字體大小 */
   text-align: center;
 }
 .alert-content button {
@@ -121,7 +121,7 @@ function closeAlert() {
       dateEl.value = toLocalDateString(next);
       timeEl.value = `${pad(next.getHours())}:${pad(next.getMinutes())}`;
       if (showAlert) {
-        showAlert('不能選擇已經過去的時間，已自動調整為下一個可用時段');
+        showAlert('不能選擇已經過去的時間，請重新選擇');
       }
       return false;
     }
