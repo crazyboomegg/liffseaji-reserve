@@ -139,7 +139,7 @@ function closeAlert() {
     const now = new Date();
 
     if (selectedDate <= now) {
-      alert('不能預約已經過去的時間，請重新選擇');
+      showAlert('不能預約已經過去的時間，請重新選擇');
       return false;
     }
     return true;
