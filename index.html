@@ -706,7 +706,15 @@
           if (!forceValidateDateTime()) return;
 
           if (!validate()) return;
-          await liff.sendMessages([{ type: 'text', text: fmt() }]);
+
+          // 從網頁轉跳、或不是從聊天室開啟時，LINE 會拒絕傳送訊息（403）
+          try {
+            await liff.sendMessages([{ type: 'text', text: fmt() }]);
+          } catch (e) {
+            console.error('sendMessages error', e);
+            showAlert('預約單傳送失敗，請關閉此頁面後，從 LINE 聊天室的圖文選單重新開啟預約。');
+            return;
+          }
           liff.closeWindow();
         });
       } catch (e) {
