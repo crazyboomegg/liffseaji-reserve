@@ -4,115 +4,552 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sea指</title>
+  <meta name="theme-color" content="#286358">
+  <title>預約｜Sea指</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
+    :root {
+      --ink: #183e3a;
+      --muted: #55706b;
+      --sea: #286358;
+      --cream: #f8f6ee;
+      --line: #d9e2d8;
+      --sand: #e8d5af;
+      --serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+      --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      color-scheme: light
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
-      padding: 20px;
-    }
-
-    label {
-      display: block;
-      margin: 10px 0 6px;
-      font-size: 14px;
-      color: #333;
-    }
-
-    input,
-    select,
-    button,
-    textarea {
-      width: 100%;
-      padding: 12px;
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--sans);
       font-size: 16px;
-      box-sizing: border-box;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased
     }
 
-    button {
-      margin-top: 14px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
+    a {
+      color: inherit
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid #bb8a37;
+      outline-offset: 4px
+    }
+
+    svg {
+      display: block
+    }
+
+    .site-header {
+      max-width: 640px;
+      margin: auto;
+      padding: 28px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 2px
+    }
+
+    .brand svg {
+      width: 35px;
+      height: 35px
+    }
+
+    .header-link {
+      font-size: 14px;
+      text-decoration: none;
+      padding: 7px 18px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      white-space: nowrap
+    }
+
+    .page {
+      max-width: 640px;
+      padding: 0 36px 48px;
+      margin: auto
+    }
+
+    .hero {
+      position: relative;
+      padding: 40px 0 36px;
+      overflow: hidden
+    }
+
+    .eyebrow {
+      margin: 0 0 13px;
+      font: 600 12px/1.5 var(--sans);
+      letter-spacing: 3px;
+      color: var(--sea)
+    }
+
+    h1 {
+      position: relative;
+      z-index: 1;
+      font-family: var(--serif);
+      font-size: 54px;
+      line-height: 1.25;
+      letter-spacing: 4px;
+      margin: 0 0 16px;
+      font-weight: 600
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px
+    }
+
+    .hero-art {
+      position: absolute;
+      right: 0;
+      top: 8px;
+      width: 260px;
+      height: 190px;
+      opacity: .8
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 2px 0 30px
+    }
+
+    .divider:before,
+    .divider:after {
+      content: "";
+      height: 1px;
+      background: var(--line);
+      flex: 1
+    }
+
+    .divider svg {
+      width: 27px;
+      height: 12px;
+      color: var(--sea)
+    }
+
+    .form-card {
+      background: #fffefa;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px #183e3a04
+    }
+
+    .card-heading {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 25px 26px 19px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .number {
+      border: 1px solid #cad9ce;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      font: italic 16px var(--serif);
+      color: var(--sea)
+    }
+
+    h2 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 25px;
+      letter-spacing: 2px;
+      line-height: 1.5
+    }
+
+    .card-subtitle {
+      display: block;
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    .fields {
+      padding: 8px 26px 26px
+    }
+
+    .field {
+      margin-top: 18px
     }
 
     .row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px
     }
 
-    .tip {
-      font-size: 13px;
-      color: #666;
-      margin-top: 8px;
+    label {
+      display: block;
+      margin: 0 0 7px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink)
+    }
+
+    .weekday {
+      margin-left: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400
+    }
+
+    input,
+    select {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      min-height: 50px;
+      padding: 12px 15px;
+      font: 16px var(--sans);
+      color: var(--ink);
+      background: var(--cream);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color .15s, background .15s
+    }
+
+    input::placeholder {
+      color: #9aaca7
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--sea);
+      background: #fff;
+      box-shadow: 0 0 0 3px #28635822
+    }
+
+    select {
+      padding-right: 40px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23286358' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center
+    }
+
+    .booking-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      width: 100%;
+      margin-top: 28px;
+      background: var(--sea);
+      color: #fff;
+      border: 0;
+      padding: 14px 24px;
+      border-radius: 50px;
+      font: 15px var(--sans);
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background .15s
+    }
+
+    .booking-button:hover {
+      background: #194c42
+    }
+
+    .booking-button span[aria-hidden] {
+      font-size: 20px;
+      line-height: 1
+    }
+
+    .page-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 18px 2px 0
+    }
+
+    .site-footer {
+      text-align: center;
+      padding-top: 27px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--muted)
+    }
+
+    /* 提示視窗 */
+    .alert-box {
+      display: none;
+      /* 預設隱藏 */
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      padding: 20px;
+      background: rgba(24, 62, 58, 0.35);
+      justify-content: center;
+      align-items: center
+    }
+
+    .alert-content {
+      width: 100%;
+      max-width: 340px;
+      background: #fffefa;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 32px 26px 24px;
+      text-align: center;
+      box-shadow: 0 12px 32px #183e3a1f
+    }
+
+    .alert-content p {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 19px;
+      letter-spacing: 1px;
+      line-height: 1.6
+    }
+
+    .alert-content .booking-button {
+      justify-content: center;
+      margin-top: 24px
+    }
+
+    @media(min-width:1200px) {
+
+      body:before,
+      body:after {
+        content: "";
+        position: fixed;
+        z-index: -1;
+        bottom: -90px;
+        width: 34vw;
+        height: 280px;
+        background: #e3ebe1;
+        border-radius: 48% 52% 0 0;
+        transform: rotate(-14deg)
+      }
+
+      body:before {
+        left: -100px
+      }
+
+      body:after {
+        right: -180px;
+        transform: rotate(14deg);
+        background: #e9eee4
+      }
+    }
+
+    @media(max-width:640px) {
+      .site-header {
+        padding: 21px 20px;
+        gap: 10px
+      }
+
+      .brand {
+        font-size: 22px;
+        gap: 7px;
+        letter-spacing: 1px
+      }
+
+      .brand svg {
+        width: 28px;
+        height: 28px
+      }
+
+      .header-link {
+        padding: 6px 14px;
+        font-size: 12px
+      }
+
+      .page {
+        padding: 0 20px 32px
+      }
+
+      .hero {
+        padding: 28px 0 27px
+      }
+
+      h1 {
+        font-size: 40px;
+        letter-spacing: 2px;
+        margin-bottom: 13px
+      }
+
+      .eyebrow {
+        font-size: 10px;
+        letter-spacing: 2px;
+        margin-bottom: 12px
+      }
+
+      .hero-copy {
+        font-size: 14px;
+        max-width: 240px
+      }
+
+      .hero-art {
+        width: 150px;
+        height: 115px;
+        right: -32px;
+        top: 16px;
+        opacity: .32
+      }
+
+      .divider {
+        margin-bottom: 23px
+      }
+
+      .card-heading {
+        padding: 22px 23px 18px
+      }
+
+      h2 {
+        font-size: 23px
+      }
+
+      .fields {
+        padding: 6px 23px 23px
+      }
+
+      .page-note {
+        margin-top: 14px;
+        font-size: 11px
+      }
+
+      .site-footer {
+        padding-top: 24px;
+        font-size: 9px;
+        letter-spacing: 2px
+      }
+    }
+
+    @media(max-width:480px) {
+      .row {
+        grid-template-columns: 1fr;
+        gap: 0
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        transition: none !important
+      }
     }
   </style>
 </head>
 
 <body>
-  <h2>預約資訊</h2>
+  <header class="site-header">
+    <span class="brand"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M5 26c6-1 11-5 14-14 1 7 5 10 11 10-6 0-11 4-14 10" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M6 33c8 3 20 1 27-5M24 9c2-2 4-3 7-3" stroke="currentColor" stroke-width="1.3"
+          stroke-linecap="round" />
+      </svg><span>Sea指</span></span>
+    <!-- <a class="header-link" href="price-list.html">價目表</a> -->
+  </header>
 
-  <label>姓名</label>
-  <input id="name" placeholder="王小明" />
+  <main class="page">
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">SEA指 / RESERVATION</p>
+      <h1 id="page-title">預約</h1>
+      <p class="hero-copy">填寫資料後送出，我們會盡快與您確認。</p>
+      <svg class="hero-art" viewBox="0 0 280 210" fill="none" aria-hidden="true">
+        <circle cx="174" cy="74" r="48" fill="#e7d9b9" />
+        <path d="M15 150c35-35 65-25 85-4s44 25 68-1 58-21 100 2v50H15z" fill="#dde7db" />
+        <path d="M15 167c30-22 59-25 87-5s59 21 91-1 49-21 75-6v42H15z" fill="#c8d9ce" />
+        <path
+          d="M43 139c19-19 35-21 54-5s35 18 54 2 34-20 58-9M24 163c18-11 34-13 50-8M173 158c16-10 32-16 48-8M86 185c27 10 55 9 87-1"
+          stroke="#558575" stroke-width="1.5" stroke-linecap="round" />
+        <path d="M54 52c9-7 18-7 25 0 8-7 16-7 24-1" stroke="#8da594" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+    </section>
 
-  <label>電話</label>
-  <input id="phone" inputmode="tel" placeholder="09xx-xxx-xxx" />
+    <div class="divider" aria-hidden="true"><svg viewBox="0 0 28 12" fill="none">
+        <path d="M1 7c3-5 6-5 9 0s6 5 9 0 5-5 8 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+      </svg></div>
 
-  <label>日期<span id="weekday" style="color:#666; font-size:12px;"></span></label>
-  <input id="date" type="date" />
+    <section class="form-card" aria-labelledby="form-title">
+      <div class="card-heading"><span class="number" aria-hidden="true">01</span>
+        <h2 id="form-title">預約資訊<span class="card-subtitle" lang="en">BOOKING DETAILS</span></h2>
+      </div>
 
-  <label>時間（每 30 分）</label>
-  <input id="time" type="time" step="1800" />
+      <div class="fields">
+        <div class="field">
+          <label for="name">姓名</label>
+          <input id="name" placeholder="王小明" autocomplete="name" />
+        </div>
 
-  <label>服務項目</label>
-  <select id="service">
-    <option value="">請選擇</option>
-    <option>肩頸指壓( 15 分鐘)</option>
-    <option>全身指壓( 30 分鐘)</option>
-    <option>全身指壓( 60 分鐘)</option>
-    <option>足療( 60 分鐘)</option>
-    <option>全身指壓+足療( 120 分鐘)</option>
-  </select>
+        <div class="field">
+          <label for="phone">電話</label>
+          <input id="phone" inputmode="tel" placeholder="09xx-xxx-xxx" autocomplete="tel" />
+        </div>
 
-  <div class="row">
-    <button id="send">送出預約單</button>
-  </div>
+        <div class="row">
+          <div class="field">
+            <label for="date">日期<span id="weekday" class="weekday"></span></label>
+            <input id="date" type="date" />
+          </div>
 
-  <div id="myAlert" class="alert-box">
+          <div class="field">
+            <label for="time">時間（每 30 分）</label>
+            <input id="time" type="time" step="1800" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="service">服務項目</label>
+          <select id="service">
+            <option value="">請選擇</option>
+            <option>肩頸指壓( 15 分鐘)</option>
+            <option>全身指壓( 30 分鐘)</option>
+            <option>全身指壓( 60 分鐘)</option>
+            <option>足療( 60 分鐘)</option>
+            <option>全身指壓+足療( 120 分鐘)</option>
+          </select>
+        </div>
+
+        <button id="send" class="booking-button" type="button">送出預約單<span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <!-- <p class="page-note">送出後會以 LINE 訊息傳送預約內容。</p> -->
+    <footer class="site-footer">SEA指 · 慢下來，感受放鬆</footer>
+  </main>
+
+  <div id="myAlert" class="alert-box" role="alertdialog" aria-modal="true" aria-labelledby="alertMessage">
     <div class="alert-content">
       <p id="alertMessage"></p>
-      <button onclick="closeAlert()">確定</button>
+      <button class="booking-button" type="button" onclick="closeAlert()">確定</button>
     </div>
   </div>
-
-  <style>
-    .alert-box {
-      display: none;
-      /* 預設隱藏 */
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.4);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .alert-content {
-      background: white;
-      padding: 40px;
-      border-radius: 8px;
-      font-size: 20px;
-      /* 這裡可以調整字體大小 */
-      text-align: center;
-    }
-
-    .alert-content button {
-      margin-top: 12px;
-      padding: 8px 16px;
-    }
-  </style>
 
   <script>
     function showAlert(msg) {
@@ -155,7 +592,7 @@
     }
 
     // 檢查並限制時間不能選擇已經過去的時間
-    function validateDateTime(showAlert = true) {
+    function validateDateTime(shouldAlert = true) {
       const dateEl = document.getElementById('date');
       const timeEl = document.getElementById('time');
 
@@ -170,7 +607,7 @@
         const next = new Date(Math.ceil(now.getTime() / stepMs) * stepMs);
         dateEl.value = toLocalDateString(next);
         timeEl.value = `${pad(next.getHours())}:${pad(next.getMinutes())}`;
-        if (showAlert) {
+        if (shouldAlert) {
           showAlert('不能選擇已經過去的時間，請重新選擇');
         }
         return false;
